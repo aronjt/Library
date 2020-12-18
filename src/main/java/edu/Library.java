@@ -60,6 +60,7 @@ public class Library {
     }
 
     public void getDailyLog() throws SQLException {
+
         System.out.println("Add meg a keresett dátumot (éééé-hh-nn)");
         Scanner sc = new Scanner(System.in);
         String date = sc.next();
