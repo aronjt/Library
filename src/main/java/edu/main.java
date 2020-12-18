@@ -8,7 +8,7 @@ import java.util.Properties;
 public class main {
     public static void main(String[] args) throws SQLException {
 
-       main sql = new main();
+        main sql = new main();
         Connection connection = sql.getConnection();
         System.out.println("connection ready");
 
