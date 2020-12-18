@@ -77,4 +77,39 @@ public class Library {
         }
     }
 
+    public void rentedBookData() throws SQLException {
+
+        System.out.println("Írja be a könyv címét");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM library.book");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            int ISBN = resultSet.getInt(1);
+            String Title = resultSet.getString(2);
+            String author = resultSet.getString(3);
+            String publisher = resultSet.getString(4);
+            int year = resultSet.getInt(5);
+
+            System.out.println(ISBN + " " + Title + " " + author + " " + publisher + " " + year);
+
+       }
+        Scanner sc = new Scanner(System.in);
+        String title = sc.next();
+        preparedStatement = connection.prepareStatement("SELECT book.Title , member.Name, log.Takeout FROM library.log join stock on log.Stock_idStock = stock.idStock join member on log.Member_idMember = member.idMember join book on stock.Book_ISBN = book.ISBN where book.Title like ?");
+        preparedStatement.setString(1,title);
+        resultSet = preparedStatement.executeQuery();
+        System.out.println(title + " című kötet kiadásának adatai: ");
+        while (resultSet.next()){
+
+            String bookTitle = resultSet.getString(1);
+            String name = resultSet.getString(2);
+            Date date = resultSet.getDate(3);
+
+            System.out.println(bookTitle + " " + name + " " + date);
+            System.out.println("-------------------------------------");
+
+
+        }
+
+    }
+
 }
