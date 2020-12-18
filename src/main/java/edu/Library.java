@@ -2,6 +2,7 @@ package edu;
 
 import java.lang.reflect.Member;
 import java.sql.*;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -15,10 +16,11 @@ public class Library {
     public static void main(String[] args) throws SQLException {
 
         Library sql = new Library();
-      //  Connection connection = sql.getConnection();
+        //  Connection connection = sql.getConnection();
         System.out.println("connection ready");
-        sql.getFullInfo();
-        sql.getMemberInfo();
+       // sql.getFullInfo();
+      //  sql.getMemberInfo();
+        sql.getDailyLog();
     }
 
     public void getFullInfo() throws SQLException {
@@ -35,25 +37,44 @@ public class Library {
     public Connection getConnection() throws SQLException {
 
         String url = "jdbc:mysql://localhost:3306/library?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";   //database specific url.
-        Properties properties = new Properties( );
-        properties.put( "user", "root" );
-        properties.put( "password", "123456789" );
+        Properties properties = new Properties();
+        properties.put("user", "root");
+        properties.put("password", "123456789");
 
         return DriverManager.getConnection(url, properties);
     }
+
     public void getMemberInfo() throws SQLException {
         System.out.println("Írja be a felhasználó azonisítót: ");
-        Scanner sc=new Scanner(System.in);
-        int memberID=sc.nextInt();
-        PreparedStatement preparedStatement=connection.prepareStatement("SELECT Member.Name, Book.Title from Member join Log on Log.Member_idMember=Member.idMember join Stock on stock.idStock=Log.Stock_idStock join Book on Stock.Book_ISBN=Book.ISBN where ? =Member.idMember");
-        preparedStatement.setInt(1,memberID);
-        ResultSet resultSet=preparedStatement.executeQuery();
-        while(resultSet.next()){
-            String name = resultSet.getString("Memeber.Name");
-            String bookTitle=resultSet.getString("Book.Title");
-            System.out.println("Név: " + name+ " Köny: "+bookTitle);
+        Scanner sc = new Scanner(System.in);
+        int memberID = sc.nextInt();
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT Member.Name, Book.Title from Member join Log on Log.Member_idMember=Member.idMember join Stock on stock.idStock=Log.Stock_idStock join Book on Stock.Book_ISBN=Book.ISBN where ? =Member.idMember");
+        preparedStatement.setInt(1, memberID);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            String name = resultSet.getString("Member.Name");
+            String bookTitle = resultSet.getString("Book.Title");
+            System.out.println("Név: " + name + " Köny: " + bookTitle);
         }
 
+    }
+
+    public void getDailyLog() throws SQLException {
+        System.out.println("Add meg a keresett dátumot (éééé-hh-nn)");
+        Scanner sc = new Scanner(System.in);
+        String date = sc.next();
+        PreparedStatement preparedStatement= connection.prepareStatement("SELECT * from log where Takeout = ?");
+        preparedStatement.setString(1,date);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int idLog = resultSet.getInt("idLog");
+            int memberIDdMember=resultSet.getInt("Member_idMember");
+            Date taketout= resultSet.getDate("Takeout");
+            Date deadline= resultSet.getDate("Deadline");
+            Date actualTakeBack= resultSet.getDate("ActualTakeback");
+            int stockIDStock= resultSet.getInt("Stock_idStock");
+            System.out.println("LogID: "+idLog+" Felszhasználó azonisító: "+memberIDdMember+" Kikölcsönzés dátuma: "+taketout+" Kiadva: "+deadline+"-ig"+"Visszahozatal dátuma: "+actualTakeBack+" Cikkszám: "+ stockIDStock);
+        }
     }
 
 }
