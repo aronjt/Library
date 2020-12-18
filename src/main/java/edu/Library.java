@@ -19,6 +19,7 @@ public class Library {
         System.out.println("connection ready");
         sql.getFullInfo();
         sql.getMemberInfo();
+        sql.rentedBookData();
     }
 
     public void getFullInfo() throws SQLException {
@@ -42,7 +43,7 @@ public class Library {
         return DriverManager.getConnection(url, properties);
     }
     public void getMemberInfo() throws SQLException {
-        System.out.println("Írja be a felhasználó azonisítót: ");
+        System.out.println("Írja be a felhasználó azonosítót: ");
         Scanner sc=new Scanner(System.in);
         int memberID=sc.nextInt();
         PreparedStatement preparedStatement=connection.prepareStatement("SELECT Member.Name, Book.Title from Member join Log on Log.Member_idMember=Member.idMember join Stock on stock.idStock=Log.Stock_idStock join Book on Stock.Book_ISBN=Book.ISBN where ? =Member.idMember");
@@ -58,8 +59,36 @@ public class Library {
 
     public void rentedBookData() throws SQLException {
 
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT book.Title ,Takeout FROM library.log join stock on log.Stock_idStock = stock.idStock join book on stock.Book_ISBN = book.ISBN where book.Title like 'első'");
+        System.out.println("Írja be a könyv címét");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM library.book");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            int ISBN = resultSet.getInt(1);
+            String Title = resultSet.getString(2);
+            String author = resultSet.getString(3);
+            String publisher = resultSet.getString(4);
+            int year = resultSet.getInt(5);
 
+            System.out.println(ISBN + " " + Title + " " + author + " " + publisher + " " + year);
+
+       }
+        Scanner sc = new Scanner(System.in);
+        String title = sc.next();
+        preparedStatement = connection.prepareStatement("SELECT book.Title , member.Name, log.Takeout FROM library.log join stock on log.Stock_idStock = stock.idStock join member on log.Member_idMember = member.idMember join book on stock.Book_ISBN = book.ISBN where book.Title like ?");
+        preparedStatement.setString(1,title);
+        resultSet = preparedStatement.executeQuery();
+        System.out.println(title + " című kötet kiadásának adatai: ");
+        while (resultSet.next()){
+
+            String bookTitle = resultSet.getString(1);
+            String name = resultSet.getString(2);
+            Date date = resultSet.getDate(3);
+
+            System.out.println(bookTitle + " " + name + " " + date);
+            System.out.println("-------------------------------------");
+
+
+        }
 
     }
 
