@@ -1,7 +1,9 @@
 package edu;
 
+import java.lang.reflect.Member;
 import java.sql.*;
 import java.util.Properties;
+import java.util.Scanner;
 
 public class Library {
 
@@ -16,6 +18,7 @@ public class Library {
       //  Connection connection = sql.getConnection();
         System.out.println("connection ready");
         sql.getFullInfo();
+        sql.getMemberInfo();
     }
 
     public void getFullInfo() throws SQLException {
@@ -37,6 +40,20 @@ public class Library {
         properties.put( "password", "123456789" );
 
         return DriverManager.getConnection(url, properties);
+    }
+    public void getMemberInfo() throws SQLException {
+        System.out.println("Írja be a felhasználó azonisítót: ");
+        Scanner sc=new Scanner(System.in);
+        int memberID=sc.nextInt();
+        PreparedStatement preparedStatement=connection.prepareStatement("SELECT Member.Name, Book.Title from Member join Log on Log.Member_idMember=Member.idMember join Stock on stock.idStock=Log.Stock_idStock join Book on Stock.Book_ISBN=Book.ISBN where ? =Member.idMember");
+        preparedStatement.setInt(1,memberID);
+        ResultSet resultSet=preparedStatement.executeQuery();
+        while(resultSet.next()){
+            String name = resultSet.getString("Memeber.Name");
+            String bookTitle=resultSet.getString("Book.Title");
+            System.out.println("Név: " + name+ " Köny: "+bookTitle);
+        }
+
     }
 
     public void rentedBookData() throws SQLException {
