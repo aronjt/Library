@@ -39,4 +39,11 @@ public class Library {
         return DriverManager.getConnection(url, properties);
     }
 
+    public void rentedBookData() throws SQLException {
+
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT book.Title ,Takeout FROM library.log join stock on log.Stock_idStock = stock.idStock join book on stock.Book_ISBN = book.ISBN where book.Title like 'első'");
+
+
+    }
+
 }
