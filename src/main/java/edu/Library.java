@@ -27,7 +27,8 @@ public class Library {
       //  sql.numberOfTakenOutBooks();
       //  sql.bookRental();
       //  sql.newMember();
-        sql.bookBroughtBack();
+      //  sql.bookBroughtBack();
+        sql.bookSearch();
     }
 
     public void bookRental() throws SQLException {
@@ -58,7 +59,7 @@ public class Library {
         Scanner sc = new Scanner(System.in);
         System.out.println("Könyv azonosító: ");
         int bookID = sc.nextInt();
-        PreparedStatement ps1 = connection.prepareStatement("UPDATE `Library`.`Log` SET `ActualTakeback` = ? WHERE (`idLog` = ?)");
+        PreparedStatement ps1 = connection.prepareStatement("UPDATE `Library`.`Log` SET `ActualTakeback` = ? WHERE (`Stock_idStock` = ? AND `ActualTakeback` IS NULL)");
         ps1.setDate(1, Date.valueOf(LocalDate.now()));
         ps1.setInt(2, bookID);
         ps1.executeUpdate();
@@ -104,6 +105,21 @@ public class Library {
         ps2.setString(7, address);
         ps2.executeUpdate();
         System.out.println("Sikeres regisztráció");
+    }
+
+    public void bookSearch() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Könyv cím: ");
+        String bookTitle = sc.nextLine();
+        PreparedStatement ps = connection.prepareStatement("SELECT Book.Title, Book.Author, COUNT(*) FROM Library.Stock JOIN Book ON Stock.Book_ISBN = Book.ISBN WHERE Book.Title = ? AND Stock.IsTaken = 'F' GROUP BY ISBN");
+        ps.setString(1, bookTitle);
+        ResultSet resultSet = ps.executeQuery();
+        while (resultSet.next()) {
+            String title = resultSet.getString(1);
+            String author = resultSet.getString(2);
+            int quantity = resultSet.getInt(3);
+            System.out.println(title + " " + author + " " + quantity);
+        }
     }
 
     public void getFullInfo() throws SQLException {
