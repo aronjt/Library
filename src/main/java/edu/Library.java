@@ -2,6 +2,7 @@ package edu;
 
 import java.lang.reflect.Member;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -24,7 +25,8 @@ public class Library {
       //  sql.mostPopularBook();
       //  sql.avgTakeOutTime();
       //  sql.numberOfTakenOutBooks();
-        sql.bookRental();
+      //  sql.bookRental();
+        sql.newMember();
     }
 
     public void bookRental() throws SQLException {
@@ -44,11 +46,41 @@ public class Library {
         PreparedStatement ps2 = connection.prepareStatement("INSERT INTO `Library`.`Log` (`idLog` ,`Member_idMember`, `Takeout`, `Deadline`, `Stock_idStock`) VALUES (?, ?, ?, ?, ?)");
         ps2.setInt(1, ++lastID);
         ps2.setInt(2, memberID);
-        ps2.setDate(3, Date.valueOf(java.time.LocalDate.now()));
-        ps2.setDate(4, Date.valueOf(java.time.LocalDate.now().plusMonths(month)));
+        ps2.setDate(3, Date.valueOf(LocalDate.now()));
+        ps2.setDate(4, Date.valueOf(LocalDate.now().plusMonths(month)));
         ps2.setInt(5, bookID);
         ps2.executeUpdate();
         System.out.println("Sikeres kölcsönzés");
+    }
+
+    public void newMember() throws SQLException {
+        PreparedStatement ps1 = connection.prepareStatement("SELECT idMember FROM Library.Member ORDER BY idMember DESC LIMIT 1");
+        int memberID = 0;
+        ResultSet resultSet = ps1.executeQuery();
+        while (resultSet.next()) {
+            memberID = resultSet.getInt(1);
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Név: ");
+        String name = sc.nextLine();
+        System.out.println("Születési év: ");
+        String birth = sc.nextLine();
+        System.out.println("Email cím: ");
+        String email = sc.nextLine();
+        System.out.println("Telefonszám: ");
+        String phoneNumber = sc.nextLine();
+        System.out.println("Lakcím: ");
+        String address = sc.nextLine();
+        PreparedStatement ps2 = connection.prepareStatement("INSERT INTO `Library`.`Member` (`idMember`, `Name`, `Membership until`, `Birth`, `Email`, `PhoneNum`, `Address`) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        ps2.setInt(1, ++memberID);
+        ps2.setString(2, name);
+        ps2.setDate(3, Date.valueOf(LocalDate.now().plusYears(1)));
+        ps2.setDate(4, Date.valueOf(birth));
+        ps2.setString(5, email);
+        ps2.setString(6, phoneNumber);
+        ps2.setString(7, address);
+        ps2.executeUpdate();
+        System.out.println("Sikeres regisztráció");
     }
 
     public void getFullInfo() throws SQLException {
