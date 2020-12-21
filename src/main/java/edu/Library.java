@@ -23,7 +23,32 @@ public class Library {
       //  sql.getDailyLog();
       //  sql.mostPopularBook();
       //  sql.avgTakeOutTime();
-        sql.numberOfTakenOutBooks();
+      //  sql.numberOfTakenOutBooks();
+        sql.bookRental();
+    }
+
+    public void bookRental() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Felhasználó azonosító: ");
+        int memberID = sc.nextInt();
+        System.out.println("Könyv azonosító: ");
+        int bookID = sc.nextInt();
+        PreparedStatement ps = connection.prepareStatement("SELECT idLog FROM Log ORDER BY idLog DESC LIMIT 1");
+        ResultSet resultSet = ps.executeQuery();
+        int lastID = 0;
+        while (resultSet.next()){
+            lastID = resultSet.getInt(1);
+        }
+        System.out.println("Kölcsönzés hossza: ");
+        int month = sc.nextInt();
+        PreparedStatement ps2 = connection.prepareStatement("INSERT INTO `Library`.`Log` (`idLog` ,`Member_idMember`, `Takeout`, `Deadline`, `Stock_idStock`) VALUES (?, ?, ?, ?, ?)");
+        ps2.setInt(1, ++lastID);
+        ps2.setInt(2, memberID);
+        ps2.setDate(3, Date.valueOf(java.time.LocalDate.now()));
+        ps2.setDate(4, Date.valueOf(java.time.LocalDate.now().plusMonths(month)));
+        ps2.setInt(5, bookID);
+        ps2.executeUpdate();
+        System.out.println("Sikeres kölcsönzés");
     }
 
     public void getFullInfo() throws SQLException {
