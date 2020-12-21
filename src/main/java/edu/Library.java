@@ -26,7 +26,8 @@ public class Library {
       //  sql.avgTakeOutTime();
       //  sql.numberOfTakenOutBooks();
       //  sql.bookRental();
-        sql.newMember();
+      //  sql.newMember();
+        sql.bookBroughtBack();
     }
 
     public void bookRental() throws SQLException {
@@ -51,6 +52,28 @@ public class Library {
         ps2.setInt(5, bookID);
         ps2.executeUpdate();
         System.out.println("Sikeres kölcsönzés");
+    }
+
+    public void bookBroughtBack() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Könyv azonosító: ");
+        int bookID = sc.nextInt();
+        PreparedStatement ps1 = connection.prepareStatement("UPDATE `Library`.`Log` SET `ActualTakeback` = ? WHERE (`idLog` = ?)");
+        ps1.setDate(1, Date.valueOf(LocalDate.now()));
+        ps1.setInt(2, bookID);
+        ps1.executeUpdate();
+        PreparedStatement ps2 = connection.prepareStatement("SELECT Deadline FROM Library.Log WHERE idLog = ?");
+        ps2.setInt(1, bookID);
+        ResultSet resultSet = ps2.executeQuery();
+        Date date = Date.valueOf(LocalDate.now());
+        while (resultSet.next()) {
+            date = resultSet.getDate(1);
+        }
+        if (date.compareTo(Date.valueOf(LocalDate.now())) < 0) {
+            System.out.println("Késedelmi díj: 1000 Forint");
+        } else {
+            System.out.println("Sikeres visszahozatal");
+        }
     }
 
     public void newMember() throws SQLException {
