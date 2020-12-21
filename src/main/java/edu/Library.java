@@ -22,7 +22,8 @@ public class Library {
       //  sql.rentedBookData();
       //  sql.getDailyLog();
       //  sql.mostPopularBook();
-        sql.avgTakeOutTime();
+      //  sql.avgTakeOutTime();
+        sql.numberOfTakenOutBooks();
     }
 
     public void getFullInfo() throws SQLException {
@@ -125,6 +126,17 @@ public class Library {
             String bookTitle = resultSet.getString(1);
             double avgTime = Math.round(resultSet.getDouble(2) * 100.0) / 100.0;
             System.out.println(bookTitle + " átlagos kölcsönzési ideje: " + avgTime + " nap.");
+        }
+    }
+
+    public void numberOfTakenOutBooks() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT Member.Name, Member.idMember, COUNT(Log.Takeout) FROM Library.Member JOIN Log ON Member.idMember = Log.Member_idMember GROUP BY Member.idMember");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            String name = resultSet.getString(1);
+            int id = resultSet.getInt(2);
+            int num = resultSet.getInt(3);
+            System.out.println("Azonosító: " + id + " Név: " + name + " Kölcsönzések száma: " + num);
         }
     }
 }
